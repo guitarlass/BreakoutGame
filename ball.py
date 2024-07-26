@@ -52,23 +52,38 @@ class Ball(Turtle):
 
             # for single_brick_list in self.brick_line.brick_lists:
             self.collide_with_brick()
+            self.screen.update()
 
     def collide_with_brick(self):
         for brick_line_color in self.brick_line.brick_line_colors:
             b = 0
             while b < len(self.brick_line.brick_lists[brick_line_color]):
-                brick_obj = self.brick_line.brick_lists[brick_line_color][b]["obj"]
-                if self.distance(brick_obj) < 50:
-                    brick_obj.hideturtle()
-                b += 1
-            print("-----")
+                brick_data = self.brick_line.brick_lists[brick_line_color][b]
+                brick_obj = brick_data["obj"]
+                brick_y = brick_obj.ycor()
+                brick_x = brick_obj.xcor()
+                brick_len = brick_data["len"] * 20
+                brick_width = brick_data["width"] * 20
+
+                # Define the bounding box for the brick
+                brick_left = brick_x - (brick_len / 2)
+                brick_right = brick_x + (brick_len / 2)
+                brick_top = brick_y + (brick_width / 2)
+                brick_bottom = brick_y - (brick_width / 2)
+
+                # Check if the ball is within the brick's bounding box
+                if (brick_left <= self.xcor() <= brick_right) and (brick_bottom <= self.ycor() <= brick_top):
+                    # brick_obj.hideturtle()
+                    print("collide")
+                    break
+                    self.brick_line.brick_lists[brick_line_color].pop(b)
+                else:
+                    b += 1
 
     def handle_boundary_x(self):
-        # Reverse the ball's x direction
         current_heading = self.heading()
         self.setheading(180 - current_heading)
 
     def handle_boundary_y(self):
-        # Reverse the ball's y direction
         current_heading = self.heading()
         self.setheading(-current_heading)
