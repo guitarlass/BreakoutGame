@@ -1,5 +1,4 @@
 from turtle import Turtle
-import turtle
 import random
 
 
@@ -34,15 +33,11 @@ class Ball(Turtle):
             target_x = random.randint(-self.screen.window_width() // 2, self.screen.window_width() // 2)
             self.towards_cor = "y"
 
-        # Calculate the distance to move
-        distance = self.distance(target_x, target_y)
-
         # Set the direction towards the random location
         self.setheading(self.towards(target_x, target_y))
 
         # Move the ball at the specified speed
         while True:
-            # print(str(self.xcor())+", "+str(self.ycor()))
             self.forward(self.ball_speed)
             if self.xcor() > 380 or self.xcor() < -380:
                 self.handle_boundary_x()
@@ -53,19 +48,8 @@ class Ball(Turtle):
 
             # for single_brick_list in self.brick_line.brick_lists:
             self.collide_with_brick()
-            # break
-            self.screen.update()
 
-    def draw_square(self, x1, y1, x2, y2, color):
-        turtle.penup()
-        turtle.goto(x1, y1)
-        turtle.pendown()
-        turtle.color(color)
-        for _ in range(2):
-            turtle.forward(x2 - x1)
-            turtle.left(90)
-            turtle.forward(y2 - y1)
-            turtle.left(90)
+            self.screen.update()
 
     def collide_with_brick(self):
         for brick_line_color in self.brick_line.brick_line_colors:
@@ -74,76 +58,45 @@ class Ball(Turtle):
                 brick_data = self.brick_line.brick_lists[brick_line_color][b]
                 brick_obj = brick_data["obj"]
 
-                half_width = brick_data["width"] * 20 /2
-                half_height = brick_data["len"] * 20/2
+                half_width = brick_data["width"] * 20 / 2
+                half_height = brick_data["len"] * 20 / 2
 
                 if (brick_obj.xcor() - half_width < self.xcor() < brick_obj.xcor() + half_width and
                         brick_obj.ycor() - half_height < self.ycor() < brick_obj.ycor() + half_height):
-                    print("collide")
+                    # Determine which direction the collision occurred from
+                    if abs(self.xcor() - brick_obj.xcor()) > abs(self.ycor() - brick_obj.ycor()):
+                        self.handle_boundary_x()
+                        # Adjust position to avoid sticking
+                        if self.xcor() > brick_obj.xcor():
+                            self.setx(brick_obj.xcor() + half_width + 1)
+                        else:
+                            self.setx(brick_obj.xcor() - half_width - 1)
+                    else:
+                        self.handle_boundary_y()
+                        # Adjust position to avoid sticking
+                        if self.ycor() > brick_obj.ycor():
+                            self.sety(brick_obj.ycor() + half_height + 1)
+                        else:
+                            self.sety(brick_obj.ycor() - half_height - 1)
 
-                    # top_left, top_right, bottom_left, bottom_right = brick_obj.get_square_corners()
-                    # tlx, tly = top_left
-                    # btx, bly = bottom_left
-                    #
-                    # trx, tr_y = top_right
-                    # brx, bry = bottom_right
-
-                    # if (tlx >= self.xcor() and tly >= self.ycor() >= bly) or (trx >= self.xcor() and tr_y >= self.ycor() >= bry):
-                    #     print("bounce x")
-                    #
-                    #
-                    # brick_y = brick_obj.ycor()
-                    # brick_x = brick_obj.xcor()
-                    # brick_len = brick_data["len"] * 20
-                    # brick_width = brick_data["width"] * 20
-                    #
-                    # # Define the bounding box for the brick
-                    # brick_left = brick_x - (brick_len / 2)
-                    # brick_right = brick_x + (brick_len / 2)
-                    # brick_top = brick_y + (brick_width / 2)
-                    # brick_bottom = brick_y - (brick_width / 2)
-
-                    # print(f"ball : {self.xcor()}, {self.ycor()}")
-                    # Check if the ball is within the brick's bounding box
-                    # if (brick_left <= self.xcor() <= brick_right) and (brick_bottom <= self.ycor() <= brick_top):
-                    # brick_obj.hideturtle()
-                    # print("collide")
-                    #
-                    # print(f"brick : l-{brick_left}, r-{brick_right}")
-                    # print(f"brick : t-{brick_top}, b-{brick_bottom}")
+                    # Remove the brick from the list after collision
                     # self.brick_line.brick_lists[brick_line_color].pop(b)
-                    #
-                    # if self.ycor() in self.brick_line.bottom_y_pos_list:
-                    #     self.handle_boundary_x()
-                    #     print("x")
-                    # else:
-                    #     self.handle_boundary_y()
-                    #     print("y")
+                    # brick_obj.hideturtle()
 
+                    # Increase ball speed
                     self.increase_ball_speed(brick_line_color)
 
-                else:
-                    b += 1
-                    # side_length_x = 20 * self.brick_line.brick_lists[brick_line_color][b]["len"]
-                    # side_length_y = 20 * self.brick_line.brick_lists[brick_line_color][b]["width"]
-                    #
-                    # # Get the corners of the brick
-                    # top_left, top_right, bottom_left, bottom_right = brick_obj.get_square_corners(side_length_x,
-                    #                                                                               side_length_y)
-                    #
-                    # # Extract the coordinates
-                    # tlx, tly = top_left
-                    # trx, try_ = top_right
-                    # blx, bly = bottom_left
-                    # brx, bry = bottom_right
-                    #
-                    # # Check if the ball's position is within the brick's bounding box
-                    # if (tlx <= self.xcor() <= trx) and (bly <= self.ycor() <= tly):
-                    #     print(f"Collide with brick {self.brick_line.brick_lists[brick_line_color][b]['no']}")
-                    #     brick_obj.hideturtle()
-                    #     self.brick_line.brick_lists[brick_line_color].pop(b)
-                    #     continue  # Skip incrementing b as the current brick is removed
-                    # b += 1
+                self.increase_ball_speed(brick_line_color)
+
+                b += 1
+
+    def handle_boundary_x(self):
+        current_heading = self.heading()
+        self.setheading(180 - current_heading)
+
+    def handle_boundary_y(self):
+        current_heading = self.heading()
+        self.setheading(-current_heading)
 
     def increase_ball_speed(self, brick_line_color):
         if brick_line_color == "green":
@@ -154,11 +107,3 @@ class Ball(Turtle):
             self.ball_speed = 7
         elif brick_line_color == "red":
             self.ball_speed = 9
-
-    def handle_boundary_x(self):
-        current_heading = self.heading()
-        self.setheading(180 - current_heading)
-
-    def handle_boundary_y(self):
-        current_heading = self.heading()
-        self.setheading(-current_heading)
