@@ -15,11 +15,13 @@ bar = Bar(screen, (0, -230))
 
 brick_line = BrickLine()
 for brick_line_color in brick_line.brick_line_colors:
-    brick_line.x_pos = -400
-    brick_line.obj_no = 1
+    # brick_line.x_pos = -400
+    # brick_line.obj_no = 1
+    brick_line.bottom_y_pos_list.append(brick_line.y_pos - (brick_line.brick_width*20)/2)
     brick_line.add_brick_line(brick_line_color)
-    brick_line.y_pos += 40 + brick_line.brick_line_space
+    brick_line.y_pos += (brick_line.brick_width*20) + brick_line.brick_line_space
 
+print(brick_line.bottom_y_pos_list)
 ball = Ball(screen, bar, brick_line)
 
 # print(brick_lists["green"][0]["len"])
