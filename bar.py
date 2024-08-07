@@ -14,6 +14,7 @@ class Bar(Turtle):
         self.goto(position)
         self.showturtle()
 
+
     def go_right(self):
         new_x_pos = self.xcor() + 20
         self.goto(new_x_pos, self.ycor())

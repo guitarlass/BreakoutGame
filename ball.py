@@ -18,6 +18,7 @@ class Ball(Turtle):
         self.towards_cor = None
         self.goto(0, -205)
         self.showturtle()
+        self.moving = True
 
     def move_ball(self):
         # Get random coordinates
@@ -36,22 +37,30 @@ class Ball(Turtle):
         # Set the direction towards the random location
         self.setheading(self.towards(target_x, target_y))
 
-        # Move the ball at the specified speed
-        while True:
-            self.forward(self.ball_speed)
-            if self.xcor() > 380 or self.xcor() < -380:
-                self.handle_boundary_x()
-            if self.ycor() > 237:
-                self.handle_boundary_y()
-            if self.distance(self.bar) < 101 and self.ycor() < -210:
-                self.handle_boundary_y()
+        self.move()
 
-            # for single_brick_list in self.brick_line.brick_lists:
-            self.collide_with_brick()
+    def move(self):
+        if self.moving:
+            # Move the ball at the specified speed
+            while True:
+                self.forward(self.ball_speed)
+                if self.xcor() > 380 or self.xcor() < -380:
+                    self.handle_boundary_x()
+                if self.ycor() > 237:
+                    self.handle_boundary_y()
+                if self.ycor() < -250:  # self.distance(self.bar) < 101 and self.ycor() < -210:
+                    self.handle_boundary_y()
 
-            self.screen.update()
+                # for single_brick_list in self.brick_line.brick_lists:
+                self.collide_with_brick()
+
+                self.screen.update()
+                # Call move again after a short delay
+                # self.screen.ontimer(self.move, 20)
 
     def collide_with_brick(self):
+        brick_space_half = self.brick_line.brick_space
+        space_btw_lines_half = self.brick_line.brick_line_space/2
         for brick_line_color in self.brick_line.brick_line_colors:
             b = 0
             while b < len(self.brick_line.brick_lists[brick_line_color]):
@@ -61,33 +70,30 @@ class Ball(Turtle):
                 half_width = brick_data["width"] * 20 / 2
                 half_height = brick_data["len"] * 20 / 2
 
-                if (brick_obj.xcor() - half_width < self.xcor() < brick_obj.xcor() + half_width and
-                        brick_obj.ycor() - half_height < self.ycor() < brick_obj.ycor() + half_height):
+                if (
+                        brick_obj.xcor() - half_width - brick_space_half < self.xcor() < brick_obj.xcor() + half_width + brick_space_half and
+                        brick_obj.ycor() - half_height - space_btw_lines_half < self.ycor() < brick_obj.ycor() + half_height + space_btw_lines_half):
                     # Determine which direction the collision occurred from
                     if abs(self.xcor() - brick_obj.xcor()) > abs(self.ycor() - brick_obj.ycor()):
                         self.handle_boundary_x()
                         # Adjust position to avoid sticking
-                        if self.xcor() > brick_obj.xcor():
-                            self.setx(brick_obj.xcor() + half_width + 1)
-                        else:
-                            self.setx(brick_obj.xcor() - half_width - 1)
+                        # if self.xcor() > brick_obj.xcor():
+                        #     self.setx(brick_obj.xcor() + half_width + .1)
+                        # else:
+                        #     self.setx(brick_obj.xcor() - half_width - .1)
                     else:
                         self.handle_boundary_y()
                         # Adjust position to avoid sticking
-                        if self.ycor() > brick_obj.ycor():
-                            self.sety(brick_obj.ycor() + half_height + 1)
-                        else:
-                            self.sety(brick_obj.ycor() - half_height - 1)
+                        # if self.ycor() > brick_obj.ycor():
+                        #     self.sety(brick_obj.ycor() + half_height + 0.1)
+                        # else:
+                        #     self.sety(brick_obj.ycor() - half_height - .1)
 
                     # Remove the brick from the list after collision
-                    # self.brick_line.brick_lists[brick_line_color].pop(b)
-                    # brick_obj.hideturtle()
-
+                    self.brick_line.brick_lists[brick_line_color].pop(b)
+                    brick_obj.hideturtle()
                     # Increase ball speed
-                    self.increase_ball_speed(brick_line_color)
-
-                self.increase_ball_speed(brick_line_color)
-
+                    # self.increase_ball_speed(brick_line_color)
                 b += 1
 
     def handle_boundary_x(self):
@@ -102,8 +108,16 @@ class Ball(Turtle):
         if brick_line_color == "green":
             self.ball_speed = 3
         elif brick_line_color == "yellow":
-            self.ball_speed = 5
+            self.ball_speed = 4
         elif brick_line_color == "orange":
-            self.ball_speed = 7
+            self.ball_speed = 5
         elif brick_line_color == "red":
-            self.ball_speed = 9
+            self.ball_speed = 6
+
+    def start(self):
+        self.moving = True
+        self.move()
+
+    def stop(self):
+        self.moving = False
+

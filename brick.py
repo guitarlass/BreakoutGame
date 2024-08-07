@@ -20,17 +20,17 @@ class Brick(Turtle):
         # self.brick_lines = ['green'] # , 'yellow', 'orange', 'red'
         # self.brick_lists = {color: [] for color in self.brick_lines}
 
-    def get_square_corners(self, side_length_x, side_length_y):
-        center_x, center_y = self.xcor(), self.ycor()
-        half_side_x = side_length_x / 2
-        half_side_y = side_length_y / 2
-
-        top_left = (center_x - half_side_x, center_y + half_side_y)
-        top_right = (center_x + half_side_x, center_y + half_side_y)
-        bottom_left = (center_x - half_side_x, center_y - half_side_y)
-        bottom_right = (center_x + half_side_x, center_y - half_side_y)
-
-        return top_left, top_right, bottom_left, bottom_right
+    # def get_square_corners(self, side_length_x, side_length_y):
+    #     center_x, center_y = self.xcor(), self.ycor()
+    #     half_side_x = side_length_x / 2
+    #     half_side_y = side_length_y / 2
+    #
+    #     top_left = (center_x - half_side_x, center_y + half_side_y)
+    #     top_right = (center_x + half_side_x, center_y + half_side_y)
+    #     bottom_left = (center_x - half_side_x, center_y - half_side_y)
+    #     bottom_right = (center_x + half_side_x, center_y - half_side_y)
+    #
+    #     return top_left, top_right, bottom_left, bottom_right
 
     # def go_right(self):
     #     new_x_pos = self.xcor() + 20
